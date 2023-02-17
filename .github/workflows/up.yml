@@ -36,12 +36,18 @@ jobs:
           terraform_version: 1.2.9
           terraform_wrapper: false
 
-      # - name: Lambda-ify
-      #   run: echo "COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.4.1 /lambda-adapter /opt/extensions/lambda-adapter" >> Dockerfile
+      - name: Lambda-ify
+        run: |
+          echo "COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.4.1 /lambda-adapter /opt/extensions/lambda-adapter" >> Dockerfile
+          cat Dockerfile
+          ls -lth
+          pwd
 
       - name: Deploy to ephemeral environment
         id: furl
         working-directory: ./.github/workflows
+        env:
+          PR_NUMBER: ${{ github.event.number }}
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.TF_BACKEND_S3_BUCKET }}" \
@@ -52,7 +58,7 @@ jobs:
           terraform plan \
             -var="name=${{ github.event.repository.name }}" \
             -var="environment=${ENVIRONMENT}" \
-            -var="image_tag=${GITHUB_SHA}" \
+            -var="image_tag=${PR_NUMBER}" \
             -out=tfplan -input=false
 
           terraform apply -auto-approve tfplan

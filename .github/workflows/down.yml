@@ -37,6 +37,8 @@ jobs:
 
       - name: Dispose of ephemeral environment
         working-directory: ./.github/workflows
+        env:
+          PR_NUMBER: ${{ github.event.number }}
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.TF_BACKEND_S3_BUCKET }}" \
@@ -45,7 +47,7 @@ jobs:
           terraform destroy -auto-approve \
             -var="name=${{ github.event.repository.name }}" \
             -var="environment=${ENVIRONMENT}" \
-            -var="image_tag=${GITHUB_SHA}"
+            -var="image_tag=${PR_NUMBER}"
 
       - name: Add PR comment
         uses: mshick/add-pr-comment@v1
