@@ -40,10 +40,10 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.number }}
         run: |
+          echo "Pull Request Number ${PR_NUMBER}"
           terraform init \
             -backend-config="bucket=${{ secrets.TF_BACKEND_S3_BUCKET }}" \
             -backend-config="key=${ENVIRONMENT}.tfstate"
-
           terraform destroy -auto-approve \
             -var="name=${{ github.event.repository.name }}" \
             -var="environment=${ENVIRONMENT}" \

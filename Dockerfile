@@ -8,3 +8,5 @@ COPY index.js index.html ./
 
 ENV PORT=8080
 CMD [ "node", "." ]
+
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.4.1 /lambda-adapter /opt/extensions/lambda-adapter

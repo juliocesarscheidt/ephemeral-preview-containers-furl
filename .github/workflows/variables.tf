@@ -1,14 +1,14 @@
 variable "name" {
   type        = string
-  description = "name for the resources"
+  description = "Name for the resources"
 }
 
 variable "environment" {
   type        = string
-  description = "environment for the resources"
+  description = "Environment for the resources"
 }
 
 variable "image_tag" {
   type        = string
-  description = "container image tag"
+  description = "Container image tag"
 }
