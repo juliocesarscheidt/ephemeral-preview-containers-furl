@@ -19,19 +19,16 @@ jobs:
       - name: Source Configuration
         working-directory: ./.github/workflows
         run: |
-          # make input envvars available to all steps
           source config.env
           echo "AWS_REGION=${AWS_REGION}" >> $GITHUB_ENV
-          echo "AWS_ROLE=${AWS_ROLE}" >> $GITHUB_ENV
-          echo "TF_BACKEND_S3_BUCKET=${TF_BACKEND_S3_BUCKET}" >> $GITHUB_ENV
           environment=${GITHUB_HEAD_REF##*/}
-          echo "ENVIRONMENT=${environment}" >> $GITHUB_ENV
+          echo "ENVIRONMENT=${environment}" | tee -a $GITHUB_ENV
 
       - name: Assume AWS IAM Role
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ env.AWS_ROLE }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
 
       - name: Install Terraform CLI
         uses: hashicorp/setup-terraform@v2
@@ -42,7 +39,7 @@ jobs:
         working-directory: ./.github/workflows
         run: |
           terraform init \
-            -backend-config="bucket=${TF_BACKEND_S3_BUCKET}" \
+            -backend-config="bucket=${{ secrets.TF_BACKEND_S3_BUCKET }}" \
             -backend-config="key=${ENVIRONMENT}.tfstate"
 
           terraform destroy -auto-approve \
