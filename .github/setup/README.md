@@ -3,7 +3,10 @@
 Provisions an IAM role that can be assumed by the GitHub Action in this repo and an S3 bucket used for storing Terraform remote state.
 
 ```sh
-terraform init && terraform apply
+terraform init && \
+  terraform validate && \
+  terraform plan && \
+  terraform apply -auto-approve
 ```
 
 ## Requirements

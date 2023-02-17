@@ -8,7 +8,6 @@ resource "aws_iam_openid_connect_provider" "github" {
 resource "aws_iam_role" "github_actions" {
   name               = "github-action-${var.github_repo}"
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role.json
-
   inline_policy {
     name = "terraform"
     policy = templatefile("${path.module}/policy.tmpl", {
@@ -23,12 +22,10 @@ resource "aws_iam_role" "github_actions" {
 data "aws_iam_policy_document" "github_actions_assume_role" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
-
     principals {
       type        = "Federated"
       identifiers = [aws_iam_openid_connect_provider.github.arn]
     }
-
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
@@ -37,25 +34,28 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
   }
 }
 
+resource "random_string" "random_str" {
+  length  = 6
+  special = false
+  lower   = true
+  upper   = false
+}
+
 # s3 bucket for terraform state
 module "terraform_state_s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 3.0"
-
-  bucket = "tf-state-${data.aws_caller_identity.current.account_id}"
+  bucket  = "tf-state-${data.aws_caller_identity.current.account_id}-${random_string.random_str.result}"
 
   attach_deny_insecure_transport_policy = true
   attach_require_latest_tls_policy      = true
-
-  acl = "private"
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
-  control_object_ownership = true
-  object_ownership         = "BucketOwnerPreferred"
+  acl                                   = "private"
+  block_public_acls                     = true
+  block_public_policy                   = true
+  ignore_public_acls                    = true
+  restrict_public_buckets               = true
+  control_object_ownership              = true
+  object_ownership                      = "BucketOwnerPreferred"
 
   versioning = {
     status     = true
