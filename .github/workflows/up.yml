@@ -49,12 +49,13 @@ jobs:
 
           terraform validate
 
-          terraform plan
+          terraform plan \
+            -var="name=${{ github.event.repository.name }}" \
+            -var="environment=${ENVIRONMENT}" \
+            -var="image_tag=${GITHUB_SHA}" \
+            -out=tfplan -input=false
 
-          # terraform apply -auto-approve \
-          #   -var="name=${{ github.event.repository.name }}" \
-          #   -var="environment=${ENVIRONMENT}" \
-          #   -var="image_tag=${GITHUB_SHA}"
+          # terraform apply -auto-approve tfplan
 
           # echo "Url=$(terraform output -json | jq '.endpoint_url.value' -r)" >> $GITHUB_OUTPUT
 
