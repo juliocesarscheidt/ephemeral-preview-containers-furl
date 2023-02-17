@@ -28,7 +28,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ env.AWS_ROLE }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
 
       - name: Install Terraform CLI
         uses: hashicorp/setup-terraform@v2
@@ -39,7 +39,7 @@ jobs:
         working-directory: ./.github/workflows
         run: |
           terraform init \
-            -backend-config="bucket=${TF_BACKEND_S3_BUCKET}" \
+            -backend-config="bucket=${{ secrets.TF_BACKEND_S3_BUCKET }}" \
             -backend-config="key=${ENVIRONMENT}.tfstate"
 
           terraform destroy -auto-approve \
